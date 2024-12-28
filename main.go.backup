@@ -1,0 +1,52 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"gopkg.in/yaml.v3"
+)
+
+type Config struct {
+	Dotfiles []string
+}
+
+func readConfigFileBytes(filename string) ([]byte, error) {
+	fileContent, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("Error opening config file: %s", err)
+	}
+
+	return fileContent, nil
+}
+
+func parseConfigFile(fileContent []byte) (*Config, error) {
+	var config Config
+	err := yaml.Unmarshal(fileContent, &config)
+	if err != nil {
+		return nil, fmt.Errorf("Error parsing config file: %s", err)
+	}
+
+	return &config, nil
+}
+
+func main() {
+	configPath := os.Getenv("DOTBUTLER_CONFIG")
+	if configPath == "" {
+		configPath = os.Getenv("HOME") + "/.butler.yml"
+	}
+
+	configFileContent, err := readConfigFileBytes(configPath)
+	if err != nil {
+		log.Fatalf("Error reading config file: %s", err)
+	}
+
+	config, err := parseConfigFile(configFileContent)
+	if err != nil {
+		log.Fatalf("Error parsing config file: %s", err)
+	}
+
+	// log out the config
+	fmt.Printf("Config: %+v\n", config)
+}
