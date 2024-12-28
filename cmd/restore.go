@@ -27,5 +27,8 @@ var restoreCommand = &cobra.Command{
 		command.Stderr = os.Stderr
 		command.Stdin = os.Stdin
 		command.Env = os.Environ()
+
+		err = command.Run()
+		cobra.CheckErr(err)
 	},
 }
